@@ -1,0 +1,1362 @@
+if _G.SpyHubLaunched  == true then
+    game:GetService("CoreGui").SpyHub:Destroy()
+end
+
+game:GetService("UserInputService").JumpRequest:connect(function()
+   if _G.infjump == true then
+       game.Players.LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState("Jumping")
+   end
+end)
+
+-- 🛠 Loader 🛠 --
+local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/GreenDeno/Venyx-UI-Library/main/source.lua"))()
+local venyx = library.new("SpyHub", 10292846770)
+wait(0.1)
+
+-- 🔲 ThemesLoader 🔲 --
+local themes = {
+Background = Color3.fromRGB(24, 24, 24),
+Glow = Color3.fromRGB(0, 0, 0),
+Accent = Color3.fromRGB(10, 10, 10),
+LightContrast = Color3.fromRGB(20, 20, 20),
+DarkContrast = Color3.fromRGB(14, 14, 14),  
+TextColor = Color3.fromRGB(255, 255, 255)
+}
+
+-- 🔶 Variable 🔶 --
+_G.SpyHubLaunched = true
+_G.infjump = false
+_G.TweenTime = 0
+local GameName = game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name
+AutoCoinCollectBeABall = false
+_G.BeABallTweenTime = 0.75
+local objectValue = Instance.new("ObjectValue")
+
+-- 💌 Page 💌 --
+wait(0.1)
+local PlayerPage = venyx:addPage("Player", 5012544693)
+local PlayerSectionHumanoid = PlayerPage:addSection("Humanoid")
+local PlayerSectionBehaviour = PlayerPage:addSection("Behaviour")
+local PlayerSectionInventory = PlayerPage:addSection("Inventory")
+local PlayerSectionInventorySave = PlayerPage:addSection("Save/Load")
+local PlayerSectionInventoryBTools = PlayerPage:addSection("BTools")
+local PlayerSectionInventoryToolsBreak = PlayerPage:addSection("Tools")
+
+local VisualPage = venyx:addPage("Visual", 5012544693)
+local TrSectionTranslation = VisualPage:addSection("Translation")
+local VisualSectionWorld = VisualPage:addSection("World")
+local VisualSectionEsp = VisualPage:addSection("Esp")
+local VisualSectionHitBox = VisualPage:addSection("HitBox")
+
+local AvatarPage = venyx:addPage("Avatar", 5012544693)
+local AvatarSectionTools = AvatarPage:addSection("Skin")
+
+local AutoPage = venyx:addPage("Auto", 5012544693)
+local AutoSectionTween = AutoPage:addSection("Auto🛠")
+
+local CurentGame = venyx:addPage(GameName, 5012544693)
+
+-- 🕳 GuiPage 🕳 --
+local theme = venyx:addPage("GuiSetting", 5012544693)
+local colors = theme:addSection("SpyHub Thèmes")
+local InfoSpyHub = theme:addSection("SpyHub Info")
+local DestroyGui = theme:addSection("SpyHub Gui")
+
+-- 🔳 GuiSetting 🔳 --
+for theme, color in pairs(themes) do
+colors:addColorPicker(theme, color, function(color3)
+venyx:setTheme(theme, color3)
+end)
+end
+
+DestroyGui:addKeybind("Toggle Gui", Enum.KeyCode.RightShift, function()
+venyx:toggle()
+end)
+
+DestroyGui:addButton("🗑️Destroy🗑️", function()
+    game:GetService("CoreGui").SpyHub:Destroy()
+    _G.SpyHubLaunched = false
+    _G.infjump = false
+    AutoCoinCollectBeABall = false
+    local IntValue = Instance.new("IntValue")
+end)
+
+DestroyGui:addButton("️Rejoin", function()
+    local tpservice= game:GetService("TeleportService")
+    local plr = game.Players.LocalPlayer
+
+    tpservice:Teleport(game.PlaceId, plr)
+end)
+
+-- 👤 Player 👤 --
+DefaultGravity = game.Workspace.Gravity
+DefaultWalkSpeed = game.Players.LocalPlayer.Character.Humanoid.WalkSpeed
+DefaultJumpPower = game.Players.LocalPlayer.Character.Humanoid.JumpPower
+DefaultHipHeight = game.Players.LocalPlayer.Character.Humanoid.HipHeight
+
+PlayerSectionHumanoid:addSlider("Gravity",game.Workspace.Gravity, 0, 500, function(GameGravity)
+    game.Workspace.Gravity = GameGravity
+end)
+
+PlayerSectionHumanoid:addSlider("WalkSpeed",game.Players.LocalPlayer.Character.Humanoid.WalkSpeed, 0, 150, function(PlayerWalkSpeed)
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = PlayerWalkSpeed
+end)
+
+PlayerSectionHumanoid:addSlider("JumpPower",game.Players.LocalPlayer.Character.Humanoid.JumpPower, 0, 150, function(PlayerJumpPower)
+    game.Players.LocalPlayer.Character.Humanoid.JumpPower = PlayerJumpPower
+end)
+
+PlayerSectionHumanoid:addSlider("HipHeight",game.Players.LocalPlayer.Character.Humanoid.HipHeight, 0, 50, function(PlayerHipHeight)
+    game.Players.LocalPlayer.Character.Humanoid.HipHeight = PlayerHipHeight
+end)
+
+PlayerSectionBehaviour:addToggle("InfinityJump", nil, function(infjump)
+    _G.infjump = infjump
+end)
+
+PlayerSectionBehaviour:addToggle("Invisible Fling", nil, function()
+    loadstring(game:HttpGet("https://pastebin.com/raw/eetwJjwC"))()
+end)
+
+-- 💨 Tween 💨 --
+AutoSectionTween:addTextbox("TweenPath", "", function(TweenPath, focusLost)
+    _G.TweenPath = TweenPath
+end)
+
+AutoSectionTween:addSlider("TweenTime",0, 0, 30, function(TweenTime)
+    _G.TweenTime = TweenTime
+end)
+
+AutoSectionTween:addToggle("TouchTransmitter", false, function(value)
+end)
+
+AutoSectionTween:addButton("PlayTween", function()
+    print(_G.TweenTime, _G.TweenPath)
+
+    local TweenService = game:GetService("TweenService")
+
+    for i,v in pairs(_G.TweenPath:GetChildren()) do
+        if (v:IsA("Part")) then
+            print(v.Name)
+            local CFrameEnd = CFrame.new(v.Position)
+            local Time = _G.TweenTime
+            local tween =  game:GetService("TweenService"):Create(game.Players.LocalPlayer.Character.HumanoidRootPart, TweenInfo.new(Time), {CFrame = CFrameEnd})
+            tween:Play()
+            tween.Completed:Wait()
+        end
+        wait()
+    end
+end)
+
+-- 🏀 BeABall 🏀 --
+if game.PlaceId == 10024974394 then
+    local BeABallCoin = CurentGame:addSection("CollectCoin")
+    local BeABallMarble = CurentGame:addSection("Marble")
+    local BeABallOther = CurentGame:addSection("Other")
+    BeABallCoin:addSlider("TweenTime (Default 0.75)",0, 0.75, 30, function(BeABallTweenTime)
+        _G.BeABallTweenTime = BeABallTweenTime
+    end)
+    
+    BeABallCoin:addToggle("AutoConvertCoin", false, function(AutoConvertCoin)
+        _G.AutoConvertCoin = AutoConvertCoin
+    end)
+    
+    BeABallCoin:addToggle("CollectAllCoin", false, function(AutoCoinCollectBeABall)
+        _G.AutoCoinCollectBeABall = AutoCoinCollectBeABall
+        local TweenTime = _G.BeABallTweenTime
+        local Source = game:GetService("Workspace").coins
+        local TweenService = game:GetService("TweenService")
+        
+        while _G.AutoCoinCollectBeABall == true do
+        for i,v in pairs(Source:GetChildren()) do
+            if (v:IsA("Part")) then
+                local CFrameEnd = CFrame.new(v.Position) -- Place your coords in here
+                local Time = TweenTime -- Time in seconds
+                local tween =  game:GetService("TweenService"):Create(game.Players.LocalPlayer.Character.Marble, TweenInfo.new(Time), {CFrame = CFrameEnd})
+                tween:Play()
+                tween.Completed:Wait()
+                if _G.AutoConvertCoin == true then
+                game:GetService("ReplicatedStorage").remotes.convertCoins:InvokeServer()
+                end
+            end
+            wait()
+        end
+        game.ReplicatedStorage.remotes.spawn:Fire()
+        wait()
+        end
+    end)
+    BeABallCoin:addButton("ClickBefore", function()
+    game:GetService("Workspace").coins.Highlight:Destroy()
+    end)
+    
+    
+    BeABallOther:addButton("Spawn", function()
+        game.ReplicatedStorage.remotes.spawn:Fire()
+    end)
+    BeABallMarble:addToggle("RambowMarble", false, function(RambowMarbleBeABall)
+        _G.RambowMarbleBeABall = RambowMarbleBeABall
+        while _G.RambowMarbleBeABall == true do
+            wait()
+            game.ReplicatedStorage.remotes.updateColor:FireServer(Color3.fromHSV(tick() % 20/20, 1, 1))
+            --game.ReplicatedStorage.remotes.updateColor:FireServer(Color3.fromRGB(math.random(0, 255), math.random(0, 255), math.random(0, 255)))
+        end
+    end)
+    BeABallMarble:addSlider("Particle ID",1, 1, 24, function(BeABallMarbleParticleID)
+        _G.BeABallMarbleParticleID = BeABallMarbleParticleID
+    end)
+    BeABallMarble:addButton("Buy Particle", function()
+        local args = {
+           [1] = _G.BeABallMarbleParticleID
+        }
+        
+        game:GetService("ReplicatedStorage").remotes.purchaseParticle:InvokeServer(unpack(args))
+    end)
+end
+
+if game.PlaceId == 537413528 then -- 💦 BuildABoat 💦 --
+    local BuildABoatEvent = CurentGame:addSection("Event")
+    local BuildABoatEventPlace = CurentGame:addSection("Place")
+    local BuildABoatTools = CurentGame:addSection("Tools")
+    BuildABoatEvent:addButton("FabbyQuest", function()
+        workspace.QuestMakerEvent:FireServer(100)
+    end)
+    BuildABoatEvent:addButton("GingerbreadFight", function()
+        workspace.QuestMakerEvent:FireServer(99)
+    end)
+    BuildABoatEvent:addButton("XmasFight", function()
+        workspace.QuestMakerEvent:FireServer(101)
+    end)
+    BuildABoatEvent:addButton("Clear Quest", function()
+        workspace.QuestMakerEvent:FireServer(0)
+    end)
+    BuildABoatEventPlace:addButton("InnerCloud", function()
+        game:GetService('TeleportService'):Teleport(1930863474)
+    end)
+    BuildABoatEventPlace:addButton("Spider", function()
+        game:GetService('TeleportService'):Teleport(1930665568)
+    end)
+    BuildABoatEventPlace:addButton("Winter", function()
+        game:GetService('TeleportService'):Teleport(1930866268)
+    end)
+    BuildABoatTools:addButton("AllTools", function()
+        for _,v in pairs(game:GetService("ReplicatedStorage").BuildingParts:GetChildren()) do
+            if (v:IsA("Tool")) then
+                v.Parent = game.Players.LocalPlayer.Backpack
+            end
+        end
+    end)
+end
+
+-- 💦 BuildABoat Event All 🏀 --
+if game.PlaceId == 1930863474 or game.PlaceId == 1930665568 or game.PlaceId == 1930866268 then
+    local BuildABoatAllEvent = CurentGame:addSection("Event")
+    BuildABoatAllEvent:addButton("Go Back", function()
+        game:GetService('TeleportService'):Teleport(537413528)
+    end)
+end
+
+if game.PlaceId == 1930665568 then -- 💦 BuildABoat Spider 🕸 --
+    local BuildABoatSpiderEvent = CurentGame:addSection("Spider")
+    BuildABoatSpiderEvent:addButton("Auto Spider", function()
+
+    local plr = game.Players.LocalPlayer;
+    local Char = game.Players.LocalPlayer.Character;
+    local Teleporting = game:GetService("TeleportService");
+    local CFrameEnd1 = CFrame.new(631, 26, -46);
+    local Time1 = 5;
+    local tween1 = game:GetService("TweenService"):Create(Char.HumanoidRootPart, TweenInfo.new(Time1), {CFrame = CFrameEnd1});
+    local CFrameEnd2 = CFrame.new(484, 68, 270);
+    local Time2 = 5;
+    local tween2 =  game:GetService("TweenService"):Create(Char.HumanoidRootPart, TweenInfo.new(Time2), {CFrame = CFrameEnd2});
+    wait(5)
+    if game.PlaceId ~= 1930665568 then
+    wait(2)
+    tween1:Play()
+    tween1.Completed:Wait(X)
+    wait(3)
+    game:GetService("Players").LocalPlayer.Character.SpiderBaby.Head.PickUpScript.ThrowRE:FireServer()
+    wait(3)
+    tween2:Play()
+    tween2.Completed:Wait(X) -- Completes, no need for additional wait time
+    while wait(0.5) do
+        game:GetService("Players").LocalPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(484, 68, 270)
+        wait(3)
+    for i,v in pairs(game:GetService("Workspace"):GetChildren()) do
+            if v.Name == "Rock" then
+                firetouchinterest(game:GetService("Players").LocalPlayer.Character.HumanoidRootPart, v, 0)
+                wait()
+                firetouchinterest(game:GetService("Players").LocalPlayer.Character.HumanoidRootPart, v, 1)
+            end
+    end
+    
+        if game.Workspace:FindFirstChild("Hook") then
+            game:GetService("Workspace").NukeToTheFaceRE:FireServer()
+    end
+    if plr.PlayerGui.ItemGained.Frame.Visible == true then
+        wait(3)
+    Teleporting:Teleport(1930665568, plr)
+    end
+    end
+    end
+    
+    end)
+end
+
+
+
+if game.PlaceId == 1930866268 then -- 💦 BuildABoat Winter ⚪ --
+    local BuildABoatSpiderEvent = CurentGame:addSection("Winter")
+    -- game:GetService("Workspace").Enemies.NutCrackerEnemy.Part
+    BuildABoatSpiderEvent:addButton("Auto Winter", function()
+    end)
+end
+
+
+-- Visural 💡
+VisualSectionWorld:addToggle("FullBright", false, function()
+    if not _G.FullBrightExecuted then
+    
+    	_G.FullBrightEnabled = false
+    
+    	_G.NormalLightingSettings = {
+    		Brightness = game:GetService("Lighting").Brightness,
+    		ClockTime = game:GetService("Lighting").ClockTime,
+    		FogEnd = game:GetService("Lighting").FogEnd,
+    		GlobalShadows = game:GetService("Lighting").GlobalShadows,
+    		Ambient = game:GetService("Lighting").Ambient
+    	}
+    
+    	game:GetService("Lighting"):GetPropertyChangedSignal("Brightness"):Connect(function()
+    		if game:GetService("Lighting").Brightness ~= 1 and game:GetService("Lighting").Brightness ~= _G.NormalLightingSettings.Brightness then
+    			_G.NormalLightingSettings.Brightness = game:GetService("Lighting").Brightness
+    			if not _G.FullBrightEnabled then
+    				repeat
+    					wait()
+    				until _G.FullBrightEnabled
+    			end
+    			game:GetService("Lighting").Brightness = 1
+    		end
+    	end)
+    
+    	game:GetService("Lighting"):GetPropertyChangedSignal("ClockTime"):Connect(function()
+    		if game:GetService("Lighting").ClockTime ~= 12 and game:GetService("Lighting").ClockTime ~= _G.NormalLightingSettings.ClockTime then
+    			_G.NormalLightingSettings.ClockTime = game:GetService("Lighting").ClockTime
+    			if not _G.FullBrightEnabled then
+    				repeat
+    					wait()
+    				until _G.FullBrightEnabled
+    			end
+    			game:GetService("Lighting").ClockTime = 12
+    		end
+    	end)
+    
+    	game:GetService("Lighting"):GetPropertyChangedSignal("FogEnd"):Connect(function()
+    		if game:GetService("Lighting").FogEnd ~= 786543 and game:GetService("Lighting").FogEnd ~= _G.NormalLightingSettings.FogEnd then
+    			_G.NormalLightingSettings.FogEnd = game:GetService("Lighting").FogEnd
+    			if not _G.FullBrightEnabled then
+    				repeat
+    					wait()
+    				until _G.FullBrightEnabled
+    			end
+    			game:GetService("Lighting").FogEnd = 786543
+    		end
+    	end)
+    
+    	game:GetService("Lighting"):GetPropertyChangedSignal("GlobalShadows"):Connect(function()
+    		if game:GetService("Lighting").GlobalShadows ~= false and game:GetService("Lighting").GlobalShadows ~= _G.NormalLightingSettings.GlobalShadows then
+    			_G.NormalLightingSettings.GlobalShadows = game:GetService("Lighting").GlobalShadows
+    			if not _G.FullBrightEnabled then
+    				repeat
+    					wait()
+    				until _G.FullBrightEnabled
+    			end
+    			game:GetService("Lighting").GlobalShadows = false
+    		end
+    	end)
+    
+    	game:GetService("Lighting"):GetPropertyChangedSignal("Ambient"):Connect(function()
+    		if game:GetService("Lighting").Ambient ~= Color3.fromRGB(178, 178, 178) and game:GetService("Lighting").Ambient ~= _G.NormalLightingSettings.Ambient then
+    			_G.NormalLightingSettings.Ambient = game:GetService("Lighting").Ambient
+    			if not _G.FullBrightEnabled then
+    				repeat
+    					wait()
+    				until _G.FullBrightEnabled
+    			end
+    			game:GetService("Lighting").Ambient = Color3.fromRGB(178, 178, 178)
+    		end
+    	end)
+    
+    	game:GetService("Lighting").Brightness = 1
+    	game:GetService("Lighting").ClockTime = 12
+    	game:GetService("Lighting").FogEnd = 786543
+    	game:GetService("Lighting").GlobalShadows = false
+    	game:GetService("Lighting").Ambient = Color3.fromRGB(178, 178, 178)
+    
+    	local LatestValue = true
+    	spawn(function()
+    		repeat
+    			wait()
+    		until _G.FullBrightEnabled
+    		while wait() do
+    			if _G.FullBrightEnabled ~= LatestValue then
+    				if not _G.FullBrightEnabled then
+    					game:GetService("Lighting").Brightness = _G.NormalLightingSettings.Brightness
+    					game:GetService("Lighting").ClockTime = _G.NormalLightingSettings.ClockTime
+    					game:GetService("Lighting").FogEnd = _G.NormalLightingSettings.FogEnd
+    					game:GetService("Lighting").GlobalShadows = _G.NormalLightingSettings.GlobalShadows
+    game:GetService("Lighting").Ambient = _G.NormalLightingSettings.Ambient
+    				else
+    					game:GetService("Lighting").Brightness = 1
+    					game:GetService("Lighting").ClockTime = 12
+    					game:GetService("Lighting").FogEnd = 786543
+    					game:GetService("Lighting").GlobalShadows = false
+    					game:GetService("Lighting").Ambient = Color3.fromRGB(178, 178, 178)
+    				end
+    				LatestValue = not LatestValue
+    			end
+    		end
+    	end)
+    end
+    
+    _G.FullBrightExecuted = true
+    _G.FullBrightEnabled = not _G.FullBrightEnabled
+end)
+
+VisualSectionEsp:addColorPicker("FriendColor", Color3.fromRGB(0, 0, 255), function(color3)
+    _G.FriendColor = color3
+end)
+
+VisualSectionEsp:addColorPicker("EnemyColor", Color3.fromRGB(255, 0, 0), function(color3)
+    _G.EnemyColor = color3
+end)
+
+VisualSectionEsp:addToggle("TeamColor", false, function(UseTeamColor)
+    _G.UseTeamColor = UseTeamColor
+end)
+
+VisualSectionEsp:addButton("Enable Esp", function()
+    print(_G.UseTeamColor, _G.EnemyColor, _G.FriendColor)
+    
+    _G.FriendColor = Color3.fromRGB(_G.FriendColor)
+    _G.EnemyColor = Color3.fromRGB(_G.EnemyColor)
+    _G.UseTeamColor = _G.UseTeamColor
+
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/zeroisswag/universal-esp/main/esp.lua"))()
+end)
+
+_G.HeadSize = 20
+VisualSectionHitBox:addSlider("HitBox Size",20, 5, 30, function(HeadSize)
+    _G.HeadSize = HeadSize
+end)
+
+VisualSectionHitBox:addButton("HitBox Expander", function()
+    
+    game:GetService('RunService').RenderStepped:connect(function()
+    for i,v in next, game:GetService('Players'):GetPlayers() do
+    if v.Name ~= game:GetService('Players').LocalPlayer.Name then
+    pcall(function()
+    v.Character.HumanoidRootPart.Size = Vector3.new(_G.HeadSize,_G.HeadSize,_G.HeadSize)
+    v.Character.HumanoidRootPart.Transparency = 0.7
+    v.Character.HumanoidRootPart.BrickColor = BrickColor.new("Really blue")
+    v.Character.HumanoidRootPart.Material = "Neon"
+    v.Character.HumanoidRootPart.CanCollide = false
+    end)
+    end
+    end
+    end)
+end)
+
+-- ⛏ Inventory ⛏ --
+PlayerSectionInventory:addDropdown("Select Tool", {"Click Teleport", "Telekinesis", "Portal Gun"}, function(PlayerSelectTool)
+    _G.PlayerSelectTool = PlayerSelectTool
+end)
+
+PlayerSectionInventory:addButton("Give Tool", function()
+    if _G.PlayerSelectTool == "Click Teleport" then
+        
+        mouse = game.Players.LocalPlayer:GetMouse()
+        tool = Instance.new("Tool")
+        tool.RequiresHandle = false
+        tool.Name = "Click Teleport"
+        tool.Activated:connect(function()
+        local pos = mouse.Hit+Vector3.new(0,2.5,0)
+        pos = CFrame.new(pos.X,pos.Y,pos.Z)
+        game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame = pos
+        end)
+        tool.Parent = game.Players.LocalPlayer.Backpack
+    
+    elseif _G.PlayerSelectTool == "Telekinesis" then
+        
+        loadstring(game:HttpGet("https://pastebin.com/raw/B6LTCMj5"))()
+    
+    elseif _G.PlayerSelectTool == "Portal Gun" then
+        
+        loadstring(game:HttpGet("https://pastebin.com/raw/LMUTnESQ"))()
+        
+    end
+end)
+
+PlayerSectionInventorySave:addButton("Save Tools", function()
+    for _,v in pairs(game.Players.LocalPlayer.Backpack:GetChildren()) do
+    if (v:IsA("Tool")) then
+    v.Parent = game.Players.LocalPlayer
+    end
+    end
+end)
+
+PlayerSectionInventorySave:addButton("Load Tools", function()
+    for _,v in pairs(game.Players.LocalPlayer:GetChildren()) do
+    if (v:IsA("Tool")) then
+    v.Parent = game.Players.LocalPlayer.Backpack
+    end
+    end
+end)
+
+PlayerSectionInventoryBTools:addButton("Give Btools", function()
+    for Btoolsitem = 1, 4 do
+	    HopperBin = Instance.new("HopperBin", game.Players.LocalPlayer.Backpack)
+	    HopperBin.BinType = Btoolsitem
+	    wait()
+    end
+end)
+
+PlayerSectionInventoryBTools:addButton("Remove Btools", function()
+    for RemoveBtoolsitem = 1, 4 do
+        game.Players.LocalPlayer.Backpack.HopperBin:Destroy()
+        wait()
+    end
+end)
+
+PlayerSectionInventoryToolsBreak:addButton("EquipeTools", function()
+    for _, tool in ipairs(game:GetService("Players").LocalPlayer.Backpack:GetChildren()) do
+        if tool:IsA("Tool") then
+             tool.Parent = game:GetService("Players").LocalPlayer.Character
+        end
+    end
+end)
+
+PlayerSectionInventoryToolsBreak:addButton("GrabAllTools", function()
+    local TweenService = game:GetService("TweenService")
+
+    for i,v in pairs(game:GetService("Workspace"):GetChildren()) do
+        if (v:IsA("Tool")) then
+            local CFrameEnd = CFrame.new(v.Handle.Position) -- Place your coords in here
+            local Time = 0 -- Time in seconds
+            local tween =  game:GetService("TweenService"):Create(game.Players.LocalPlayer.Character.HumanoidRootPart, TweenInfo.new(Time), {CFrame = CFrameEnd})
+            tween:Play()
+            tween.Completed:Wait()
+        end
+        wait()
+    end
+end)
+
+PlayerSectionInventoryToolsBreak:addToggle("DupeTools", false, function(GameCrash)
+    _G.GameCrash = GameCrash
+    while _G.GameCrash == true do
+        wait(0.5)
+        for _, tool in ipairs(game:GetService("Players").LocalPlayer.Backpack:GetChildren()) do
+            if tool:IsA("Tool") then
+                tool.Parent = game:GetService("Players").LocalPlayer.Character
+            end
+        end
+        for i, v in pairs(game.Players.LocalPlayer.Character:GetChildren()) do
+            if v:IsA("Tool") then
+                v.Parent = game.Workspace
+            end
+        end
+        game.Players.LocalPlayer.Character:Destroy()
+    end
+end)
+
+-- 🌳 NaturalDisaster 🌳 --
+if game.PlaceId == 189707 then
+    local NaturalDisasterMain = CurentGame:addSection("Main")
+    NaturalDisasterMain:addToggle("NoFallDamage🛠", false, function(NoFallDamageNatural)
+        game.Players.LocalPlayer.Character.FallDamageScript:Destroy()
+    end)
+end
+
+if game.PlaceId == 9984770240 then -- 💦 ObbyBall 💦 --
+    local ObbyBall = CurentGame:addSection("Checkpoints")
+    
+    ObbyBall:addSlider("Checkpoints N°", 0, 0, 121, function(ObbyBallCheak)
+        _G.ObbyBallCheak = ObbyBallCheak
+    end)
+    
+    ObbyBall:addButton("Tween", function()
+    end)
+end
+
+-- 💡 Skin 💡 --
+AvatarSectionTools:addDropdown("SkinThing", {"SkinTools", "Emote", "HatsPet", "HatsSpin", "BallRoll", "Walkable Hat", "Universal Hat(R6)"}, function(SelectedSkinChange)
+    _G.SelectedSkinChange = SelectedSkinChange
+end)
+
+
+
+
+AvatarSectionTools:addButton("Execute", function()
+
+if _G.SelectedSkinChange == "SkinTools" then
+    loadstring(game:HttpGet("https://pastebin.com/raw/9A9HVeAB"))()
+elseif _G.SelectedSkinChange == "Emote" then
+    loadstring(game:HttpGet("https://pastebin.com/raw/5WZCeftU"))()
+elseif _G.SelectedSkinChange == "HatsPet" then
+    loadstring(game:HttpGet("https://pastebin.com/raw/VD5LSKVn"))()
+elseif _G.SelectedSkinChange == "HatsSpin" then
+    local obese = game:GetService('Players')
+    for i,v in pairs(obese.LocalPlayer.Character:GetChildren()) do
+        if v.ClassName == "Accessory" then
+            local stg = v.Handle:FindFirstChildOfClass("BodyForce")
+                if stg == nil then
+                    local a = Instance.new("BodyPosition")
+                    local b = Instance.new("BodyAngularVelocity")
+                    a.Parent = v.Handle
+                    b.Parent = v.Handle
+                    v.Handle.AccessoryWeld:Destroy()
+                    b.AngularVelocity = Vector3.new(0,100,0)
+                    b.MaxTorque = Vector3.new(0,200,0)
+                    a.P = 30000
+                    a.D = 50
+                    game:GetService('RunService').Stepped:connect(function()
+                    a.Position = obese.LocalPlayer.Character.Head.Position
+                end)
+            end
+        end
+    end
+elseif _G.SelectedSkinChange == "BallRoll" then
+    loadstring(game:HttpGet("https://pastebin.com/raw/TajXJjSx"))()
+elseif _G.SelectedSkinChange == "Walkable Hat" then
+    for _, v in pairs(game.Players.LocalPlayer.Character:getChildren()) do
+	if v.ClassName == "Accessory" then
+		for i, k in pairs(v:GetDescendants()) do
+			if k.ClassName == "Attachment" then
+				s = Instance.new("RopeConstraint")
+				k.Parent.CanCollide = true
+				s.Parent = game.Players.LocalPlayer.Character.HumanoidRootPart
+				s.Attachment1 = k
+				s.Attachment0 = game.Players.LocalPlayer.Character.Head.FaceCenterAttachment
+				s.Visible = true
+				s.Length = 10
+				v.Handle.AccessoryWeld:Destroy()
+			end
+		end
+	end
+end
+elseif _G.SelectedSkinChange == "Universal Hat(R6)" then
+    loadstring(game:HttpGet("https://pastebin.com/raw/4B4fktPS", true))()
+end
+end)
+
+
+
+
+
+
+
+
+
+if game.PlaceId == 6381744121 then -- 💦 Fortinatite ⚪ --
+    
+_G.skins = {}
+if game:GetService("ReplicatedStorage").Modules.Skins then
+    _G.skins = require(game:GetService("ReplicatedStorage").Modules.Skins)
+    _G.skins = {}
+    for key, _ in pairs(_G.skins) do
+        table.insert(_G.skins,key)
+    end
+end
+
+    local FortinatiteCustomise = CurentGame:addSection("Customise")
+    
+    FortinatiteCustomise:addDropdown("Skin", {skins,}, function(skinsValue)
+        game:GetService("ReplicatedStorage").Remotes.Skin:FireServer(skinsValue)
+    end)
+end
+
+InfoSpyHub:addButton("SpyHub Discord", function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/GreenDeno/Venyx-UI-Library/main/source.lua"))()
+end)
+
+-- 🥘 Translate 🥘 --
+
+TrSectionTranslation:addDropdown("en", {
+"af", "sq", "am", "ar", "hy",
+"az", "eu", "be", "bn", "bs",
+"bg", "ca", "ceb", "ny", "co",
+"hr", "cs", "da", "nl", "en",
+"eo", "et", "tl", "fi", "fr",
+"fy", "gl", "ka", "de", "el",
+"gu", "ht", "ha", "haw", "iw",
+"hi", "hmn", "hu", "is", "ig",
+"id", "ga", "it", "ja", "jw",
+"kn", "kk", "km", "ko", "ku",
+"ky", "lo", "la", "lv", "lt",
+"lb", "mk", "mg", "ms", "ml",
+"mt", "mi", "mr", "mn", "my",
+"ne", "no", "ps", "fa", "pl",
+"pt", "pa", "ro", "ru", "sm",
+"gd", "sr", "st", "sn", "sd",
+"si", "sk", "sl", "so", "es",
+"su", "sw", "sv", "tg", "ta",
+"te", "th", "tr", "uk", "ur",
+"uz", "vi", "cy", "xh", "yi",
+"yo", "zu"
+}, function(LanguageTrand)
+_G.LanguageTrand = LanguageTrand
+end)
+
+TrSectionTranslation:addButton("Translate", function()
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    if not game['Loaded'] then game['Loaded']:Wait() end; repeat wait(.06) until game:GetService('Players').LocalPlayer ~= nil
+local YourLang = _G.LanguageTrand -- Language code that the messages are going to be translated to
+
+local googlev = isfile'googlev.txt' and readfile'googlev.txt' or ''
+local request = request or syn.request
+
+local function outputHook(fnc)
+    return function(...)
+        return fnc('[INLINE TRANSLATOR]', ...)
+    end
+end
+
+local print,warn = outputHook(print), outputHook(warn)
+
+-- // GOOGLE TRANSLATE // --
+
+local translate, getISOCode do
+    function googleConsent(Body) -- Because google really said: "Fuck you."
+        local args = {}
+
+        for match in Body:gmatch('<input type="hidden" name=".-" value=".-">') do
+            local k,v = match:match('<input type="hidden" name="(.-)" value="(.-)">')
+            args[k] = v
+        end
+        googlev = args.v
+        writefile('googlev.txt', args.v)
+    end
+
+    local function got(url, Method, Body) -- Basic version of https://www.npmjs.com/package/got using synapse's request API for google websites
+        Method = Method or "GET"
+        
+        local res = request({
+            Url = url,
+            Method = Method,
+            Headers = {cookie="CONSENT=YES+"..googlev},
+            Body = Body
+        })
+        
+        if res.Body:match('https://consent.google.com/s') then
+            print('consent')
+            googleConsent(res.Body)
+            res = request({
+                Url = url,
+                Method = "GET",
+                Headers = {cookie="CONSENT=YES+"..googlev}
+            })
+        end
+        
+        return res
+    end
+
+    local languages = {
+        auto = "Automatic",
+        af = "Afrikaans",
+        sq = "Albanian",
+        am = "Amharic",
+        ar = "Arabic",
+        hy = "Armenian",
+        az = "Azerbaijani",
+        eu = "Basque",
+        be = "Belarusian",
+        bn = "Bengali",
+        bs = "Bosnian",
+        bg = "Bulgarian",
+        ca = "Catalan",
+        ceb = "Cebuano",
+        ny = "Chichewa",
+        ['zh-cn'] = "Chinese Simplified",
+        ['zh-tw'] = "Chinese Traditional",
+        co = "Corsican",
+        hr = "Croatian",
+        cs = "Czech",
+        da = "Danish",
+        nl = "Dutch",
+        en = "English",
+        eo = "Esperanto",
+        et = "Estonian",
+        tl = "Filipino",
+        fi = "Finnish",
+        fr = "French",
+        fy = "Frisian",
+        gl = "Galician",
+        ka = "Georgian",
+        de = "German",
+        el = "Greek",
+        gu = "Gujarati",
+        ht = "Haitian Creole",
+        ha = "Hausa",
+        haw = "Hawaiian",
+        iw = "Hebrew",
+        hi = "Hindi",
+        hmn = "Hmong",
+        hu = "Hungarian",
+        is = "Icelandic",
+        ig = "Igbo",
+        id = "Indonesian",
+        ga = "Irish",
+        it = "Italian",
+        ja = "Japanese",
+        jw = "Javanese",
+        kn = "Kannada",
+        kk = "Kazakh",
+        km = "Khmer",
+        ko = "Korean",
+        ku = "Kurdish (Kurmanji)",
+        ky = "Kyrgyz",
+        lo = "Lao",
+        la = "Latin",
+        lv = "Latvian",
+        lt = "Lithuanian",
+        lb = "Luxembourgish",
+        mk = "Macedonian",
+        mg = "Malagasy",
+        ms = "Malay",
+        ml = "Malayalam",
+        mt = "Maltese",
+        mi = "Maori",
+        mr = "Marathi",
+        mn = "Mongolian",
+        my = "Myanmar (Burmese)",
+        ne = "Nepali",
+        no = "Norwegian",
+        ps = "Pashto",
+        fa = "Persian",
+        pl = "Polish",
+        pt = "Portuguese",
+        pa = "Punjabi",
+        ro = "Romanian",
+        ru = "Russian",
+        sm = "Samoan",
+        gd = "Scots Gaelic",
+        sr = "Serbian",
+        st = "Sesotho",
+        sn = "Shona",
+        sd = "Sindhi",
+        si = "Sinhala",
+        sk = "Slovak",
+        sl = "Slovenian",
+        so = "Somali",
+        es = "Spanish",
+        su = "Sundanese",
+        sw = "Swahili",
+        sv = "Swedish",
+        tg = "Tajik",
+        ta = "Tamil",
+        te = "Telugu",
+        th = "Thai",
+        tr = "Turkish",
+        uk = "Ukrainian",
+        ur = "Urdu",
+        uz = "Uzbek",
+        vi = "Vietnamese",
+        cy = "Welsh",
+        xh = "Xhosa",
+        yi = "Yiddish",
+        yo = "Yoruba",
+        zu = "Zulu"
+    };
+
+    function find(lang)
+        for i,v in pairs(languages) do
+            if i == lang or v == lang then
+                return i
+            end
+        end
+    end
+
+    function isSupported(lang)
+        local key = find(lang)
+        return key and true or false 
+    end
+
+    function getISOCode(lang)
+        local key = find(lang)
+        return key
+    end
+
+    function stringifyQuery(dataFields)
+        local data = ""
+        for k, v in pairs(dataFields) do
+            if type(v) == "table" then
+                for _,v in pairs(v) do
+                    data = data .. ("&%s=%s"):format(
+                        game.HttpService:UrlEncode(k),
+                        game.HttpService:UrlEncode(v)
+                    )
+                end
+            else
+                data = data .. ("&%s=%s"):format(
+                    game.HttpService:UrlEncode(k),
+                    game.HttpService:UrlEncode(v)
+                )
+            end
+        end
+        data = data:sub(2)
+        return data
+    end
+
+    local reqid = math.random(1000,9999)
+    local rpcidsTranslate = "MkEWBc"
+    local rootURL = "https://translate.google.com/"
+    local executeURL = "https://translate.google.com/_/TranslateWebserverUi/data/batchexecute"
+    local fsid, bl
+
+    do -- init
+        print('initialize')
+        local InitialReq = got(rootURL)
+        fsid = InitialReq.Body:match('"FdrFJe":"(.-)"')
+        bl = InitialReq.Body:match('"cfb2h":"(.-)"')
+    end
+
+    local HttpService = game:GetService("HttpService")
+    function jsonE(o)
+        return HttpService:JSONEncode(o)
+    end
+    function jsonD(o)
+        return HttpService:JSONDecode(o)
+    end
+
+    function translate(str, to, from)
+        reqid+=10000
+        from = from and getISOCode(from) or 'auto'
+        to = to and getISOCode(to) or 'en'
+
+        local data = {{str, from, to, true}, {nil}}
+
+        local freq = {
+            {
+                {
+                    rpcidsTranslate, 
+                    jsonE(data),
+                    nil,
+                    "generic"
+                }
+            }
+        }
+
+        local url = executeURL..'?'..stringifyQuery{rpcids = rpcidsTranslate, ['f.sid'] = fsid, bl = bl, hl="en", _reqid = reqid-10000, rt = 'c'}
+        local body = stringifyQuery{['f.req'] = jsonE(freq)}
+        
+        local req = got(url, "POST", body)
+        
+        local body = jsonD(req.Body:match'%[.-%]\n')
+        local translationData = jsonD(body[1][3])
+        local result = {
+            text = "",
+            from = {
+                language = "",
+                text = ""
+            },
+            raw = ""
+        }
+        result.raw = translationData
+        result.text = translationData[2][1][1][6][1][1]
+        
+        result.from.language = translationData[3]
+        result.from.text = translationData[2][5][1]
+
+        return result
+    end
+end
+
+local Players = game:GetService("Players")
+local LP = Players.LocalPlayer
+local StarterGui = game:GetService('StarterGui')
+for i=1, 15 do
+    local r = pcall(StarterGui["SetCore"])
+    if r then break end
+    game:GetService('RunService').RenderStepped:wait()
+end
+wait()
+
+local properties = {
+    Color = Color3.new(1,1,0);
+    Font = Enum.Font.SourceSansItalic;
+    TextSize = 16;
+}
+
+game:GetService("StarterGui"):SetCore("SendNotification",
+    {
+        Title = "Chat Translator",
+        Text = "Ported to Google Translate",
+        Duration = 3
+    }
+)
+                  
+properties.Text = "[TR] To send messages in a language, say > followed by the target language/language code, e.g.: >ru or >russian. To disable (go back to original language), say >d."
+StarterGui:SetCore("ChatMakeSystemMessage", properties)
+
+function translateFrom(message)
+    local translation = translate(message, YourLang)
+
+    local text
+    if translation.from.language ~= YourLang then 
+        text = translation.text
+    end
+
+    return {text, translation.from.language}
+end
+
+-- // CHAT FUNCTIONS // --
+
+local CBar, Connected = LP['PlayerGui']:WaitForChild('Chat')['Frame'].ChatBarParentFrame['Frame'].BoxFrame['Frame'].ChatBar, {}
+local EventFolder = game:GetService('ReplicatedStorage'):WaitForChild('DefaultChatSystemChatEvents')
+local Chat do
+    function Chat(Original, msg, Channel)
+        CBar.Text = msg
+        for i,v in pairs(getconnections(CBar.FocusLost)) do
+            v:Fire(true, nil, true)
+        end
+    end
+
+    --[[
+    local ChatMain = LP.PlayerScripts:FindFirstChild('ChatMain', true)
+    local MessageSender if ChatMain then
+        MessageSender = require(ChatMain.MessageSender)
+        ChatMain = require(ChatMain)
+    end
+
+    function Chat(Original, msg, Channel)
+        Channel = Channel or "All"
+        if MessageSender and ChatMain then
+            ChatMain.MessagePosted:fire(Original)
+            MessageSender:SendMessage(msg, Channel)
+        else
+            if not _G.SecureChat then
+                game:GetService('Players'):Chat(Original); 
+            end
+            EventFolder.SayMessageRequest:FireServer(msg, Channel)
+        end
+    end]]
+end
+
+do -- :Chatted replacement!!
+    function get(plr, msg)
+        print(msg)
+        local tab = translateFrom(msg)
+        local translation = tab[1]
+        print(translation)
+        if translation then
+            properties.Text = "("..tab[2]:upper()..") ".."[".. plr .."]: "..translation
+            StarterGui:SetCore("ChatMakeSystemMessage", properties)
+        end
+    end
+
+    EventFolder:WaitForChild("OnMessageDoneFiltering").OnClientEvent:Connect(function(data)
+        if data == nil then return end
+
+        local plr = Players:FindFirstChild(data.FromSpeaker)
+        local msg = tostring(data.Message)
+        local originalchannel = tostring(data.OriginalChannel)
+
+        if plr then 
+            plr = plr.DisplayName 
+        else 
+            plr = tostring(data.FromSpeaker)
+        end
+
+        if originalchannel:find("To ") then
+            plr = plr..originalchannel
+        end
+
+        get(plr, msg)
+    end)
+end
+
+local sendEnabled = false
+local target = ""
+
+function translateTo(message, target)
+    target = target:lower() 
+    local translation = translate(message, target, "auto")
+
+    return translation.text
+end
+
+function disableSend()
+    sendEnabled = false
+    properties.Text = "[TR] Sending Disabled"
+    StarterGui:SetCore("ChatMakeSystemMessage", properties)
+end
+
+
+local HookChat = function(Bar)
+    coroutine.wrap(function()
+        if not table.find(Connected,Bar) then
+            local Connect = Bar['FocusLost']:Connect(function(Enter, _, ignore)
+                if ignore then return end
+                if Enter ~= false and Bar.Text ~= '' then
+                    local Message = Bar.Text
+                    Bar.Text = ''
+                    if Message == ">d" then
+                        disableSend()
+                    elseif Message:sub(1,1) == ">" and not Message:find(" ") then
+                        if getISOCode(Message:sub(2)) then
+                            sendEnabled = true
+                            target = Message:sub(2)
+                        else
+                            properties.Text = "[TR] Invalid language"
+                            StarterGui:SetCore("ChatMakeSystemMessage", properties)
+                        end
+                    elseif sendEnabled and not (Message:sub(1,3) == "/e " or Message:sub(1,7) == "/emote ") then
+                        local og = Message
+                        Message = translateTo(Message, target)
+                        --Bar.Text = Message
+                        Chat(og, Message)
+                    else
+                        --Bar.Text = Message
+                        Chat(Message, Message)
+                    end
+                end
+            end)
+            Connected[#Connected+1] = Bar; Bar['AncestryChanged']:Wait(); Connect:Disconnect()
+        end
+    end)()
+end
+
+HookChat(CBar); local BindHook = Instance.new('BindableEvent')
+
+local MT = getrawmetatable(game); local NC = MT.__namecall; setreadonly(MT, false)
+
+MT.__namecall = newcclosure(function(...)
+    local Method, Args = getnamecallmethod(), {...}
+    if rawequal(tostring(Args[1]),'ChatBarFocusChanged') and rawequal(Args[2],true) then 
+        if LP['PlayerGui']:FindFirstChild('Chat') then
+            BindHook:Fire()
+        end
+    end
+    return NC(...)
+end)
+
+BindHook['Event']:Connect(function()
+    CBar = LP['PlayerGui'].Chat['Frame'].ChatBarParentFrame['Frame'].BoxFrame['Frame'].ChatBar
+    HookChat(CBar)
+end)
+--[[
+af = "Afrikaans",
+    sq = "Albanian",
+    am = "Amharic",
+    ar = "Arabic",
+    hy = "Armenian",
+    az = "Azerbaijani",
+    eu = "Basque",
+    be = "Belarusian",
+    bn = "Bengali",
+    bs = "Bosnian",
+    bg = "Bulgarian",
+    ca = "Catalan",
+    ceb = "Cebuano",
+    ny = "Chichewa",
+    ['zh-cn'] = "Chinese Simplified",
+    ['zh-tw'] = "Chinese Traditional",
+    co = "Corsican",
+    hr = "Croatian",
+    cs = "Czech",
+    da = "Danish",
+    nl = "Dutch",
+    en = "English",
+    eo = "Esperanto",
+    et = "Estonian",
+    tl = "Filipino",
+    fi = "Finnish",
+    fr = "French",
+    fy = "Frisian",
+    gl = "Galician",
+    ka = "Georgian",
+    de = "German",
+    el = "Greek",
+    gu = "Gujarati",
+    ht = "Haitian Creole",
+    ha = "Hausa",
+    haw = "Hawaiian",
+    iw = "Hebrew",
+    hi = "Hindi",
+    hmn = "Hmong",
+    hu = "Hungarian",
+    is = "Icelandic",
+    ig = "Igbo",
+    id = "Indonesian",
+    ga = "Irish",
+    it = "Italian",
+    ja = "Japanese",
+    jw = "Javanese",
+    kn = "Kannada",
+    kk = "Kazakh",
+    km = "Khmer",
+    ko = "Korean",
+    ku = "Kurdish (Kurmanji)",
+    ky = "Kyrgyz",
+    lo = "Lao",
+    la = "Latin",
+    lv = "Latvian",
+    lt = "Lithuanian",
+    lb = "Luxembourgish",
+    mk = "Macedonian",
+    mg = "Malagasy",
+    ms = "Malay",
+    ml = "Malayalam",
+    mt = "Maltese",
+    mi = "Maori",
+    mr = "Marathi",
+    mn = "Mongolian",
+    my = "Myanmar (Burmese)",
+    ne = "Nepali",
+    no = "Norwegian",
+    ps = "Pashto",
+    fa = "Persian",
+    pl = "Polish",
+    pt = "Portuguese",
+    pa = "Punjabi",
+    ro = "Romanian",
+    ru = "Russian",
+    sm = "Samoan",
+    gd = "Scots Gaelic",
+    sr = "Serbian",
+    st = "Sesotho",
+    sn = "Shona",
+    sd = "Sindhi",
+    si = "Sinhala",
+    sk = "Slovak",
+    sl = "Slovenian",
+    so = "Somali",
+    es = "Spanish",
+    su = "Sundanese",
+    sw = "Swahili",
+    sv = "Swedish",
+    tg = "Tajik",
+    ta = "Tamil",
+    te = "Telugu",
+    th = "Thai",
+    tr = "Turkish",
+    uk = "Ukrainian",
+    ur = "Urdu",
+    uz = "Uzbek",
+    vi = "Vietnamese",
+    cy = "Welsh",
+    xh = "Xhosa",
+    yi = "Yiddish",
+    yo = "Yoruba",
+    zu = "Zulu"
+--]]
+end)
+
+if game.PlaceId == 6679968919 then
+    local FlyRaceAutoFarm = CurentGame:addSection("AutoFarm")
+    
+    FlyRaceAutoFarm:addToggle("FlyRace n°1", false, function(FlyRace3)
+        
+local TweenTime = 0
+local TweenService = game:GetService("TweenService")
+
+while FlyRace1 == true do
+    local CFrameEnd = CFrame.new(game:GetService("Workspace").LandSpots1.End.Position) -- Place your coords in here
+    local Time = TweenTime -- Time in seconds       
+    local tween =  game:GetService("TweenService"):Create(game.Players.LocalPlayer.Character.HumanoidRootPart, TweenInfo.new(Time), {CFrame = CFrameEnd})
+    tween:Play()
+    tween.Completed:Wait()
+    wait()
+    if FlyRace1 == false then
+        return
+    end
+end
+if FlyRace1 == false then
+    
+local TweenTime = 0
+local TweenService = game:GetService("TweenService")
+
+local CFrameEnd = CFrame.new(game:GetService("Workspace").LandSpots1.Land.Position) -- Place your coords in here
+local Time = TweenTime -- Time in seconds       
+local tween =  game:GetService("TweenService"):Create(game.Players.LocalPlayer.Character.HumanoidRootPart, TweenInfo.new(Time), {CFrame = CFrameEnd})
+tween:Play()
+tween.Completed:Wait()
+wait(2.5)
+game.Players.LocalPlayer.Character.Humanoid.Health = 0
+end
+
+end)
+    
+FlyRaceAutoFarm:addToggle("FlyRace n°2", false, function(FlyRace2)
+        
+local TweenTime = 0
+local TweenService = game:GetService("TweenService")
+
+while FlyRace2 == true do
+    local CFrameEnd = CFrame.new(game:GetService("Workspace").LandSpots2.End.Position) -- Place your coords in here
+    local Time = TweenTime -- Time in seconds       
+    local tween =  game:GetService("TweenService"):Create(game.Players.LocalPlayer.Character.HumanoidRootPart, TweenInfo.new(Time), {CFrame = CFrameEnd})
+    tween:Play()
+    tween.Completed:Wait()
+    wait()
+    if FlyRace2 == false then
+        return
+    end
+end
+if FlyRace2 == false then
+    
+local TweenTime = 0
+local TweenService = game:GetService("TweenService")
+
+local CFrameEnd = CFrame.new(game:GetService("Workspace").LandSpots2.Land.Position) -- Place your coords in here
+local Time = TweenTime -- Time in seconds       
+local tween =  game:GetService("TweenService"):Create(game.Players.LocalPlayer.Character.HumanoidRootPart, TweenInfo.new(Time), {CFrame = CFrameEnd})
+tween:Play()
+tween.Completed:Wait()
+wait(2.5)
+game.Players.LocalPlayer.Character.Humanoid.Health = 0
+end
+
+end)
+    
+    FlyRaceAutoFarm:addToggle("FlyRace n°3", false, function(FlyRace3)
+        
+local TweenTime = 0
+local TweenService = game:GetService("TweenService")
+
+while FlyRace3 == true do
+    local CFrameEnd = CFrame.new(game:GetService("Workspace").LandSpots3.End.Position) -- Place your coords in here
+    local Time = TweenTime -- Time in seconds       
+    local tween =  game:GetService("TweenService"):Create(game.Players.LocalPlayer.Character.HumanoidRootPart, TweenInfo.new(Time), {CFrame = CFrameEnd})
+    tween:Play()
+    tween.Completed:Wait()
+    wait()
+    if FlyRace3 == false then
+        return
+    end
+end
+if FlyRace3 == false then
+    
+local TweenTime = 0
+local TweenService = game:GetService("TweenService")
+
+local CFrameEnd = CFrame.new(game:GetService("Workspace").LandSpots3.Land.Position) -- Place your coords in here
+local Time = TweenTime -- Time in seconds       
+local tween =  game:GetService("TweenService"):Create(game.Players.LocalPlayer.Character.HumanoidRootPart, TweenInfo.new(Time), {CFrame = CFrameEnd})
+tween:Play()
+tween.Completed:Wait()
+wait(2.5)
+game.Players.LocalPlayer.Character.Humanoid.Health = 0
+end
+
+end)
+end
+
+venyx:SelectPage(venyx.pages[1], true)
